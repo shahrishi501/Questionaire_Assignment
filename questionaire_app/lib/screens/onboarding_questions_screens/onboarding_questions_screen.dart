@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
+import 'package:questionaire_app/widgets/appBar_widget.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:io';
 
@@ -11,7 +12,6 @@ import 'package:questionaire_app/widgets/gradient_button_widget.dart';
 import 'package:questionaire_app/widgets/gradient_icon_widget.dart';
 import 'package:questionaire_app/widgets/textfield_widget.dart';
 import 'package:questionaire_app/widgets/video_recording_widget.dart';
-import 'package:questionaire_app/widgets/waveform_progress_widget.dart';
 
 class OnboardingQuestionsScreen extends StatefulWidget {
   const OnboardingQuestionsScreen({super.key});
@@ -207,33 +207,7 @@ class _OnboardingQuestionsScreenState extends State<OnboardingQuestionsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.base1,
-      appBar: AppBar(
-        backgroundColor: AppColors.surfaceWhite1,
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
-          child: SizedBox(
-            width: 300,
-            child: Center(
-              child: WaveProgressIndicator(
-                progress: 0.75,
-                activeColor: AppColors.primaryAccent,
-                inactiveColor: AppColors.border2,
-              ),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.text1),
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.clear, color: AppColors.text1),
-          ),
-        ],
-      ),
+      appBar: AppbarWidget(progress: 0.75),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Container(

@@ -55,7 +55,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     });
   }
 
-  /// Initializes and starts audio recording
+  // Initializes and starts audio recording
   Future<void> _startRecording() async {
     try {
       if (await _audioRecorder.hasPermission()) {
@@ -80,7 +80,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     }
   }
 
-  /// Stops audio recording
+  // Stops audio recording
   Future<void> _stopRecording() async {
     try {
       final path = await _audioRecorder.stop();
@@ -107,7 +107,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     }
   }
 
-  /// Plays the recorded audio
+  // Plays the recorded audio
   Future<void> _playAudio() async {
     try {
       if (_filePath != null && _isPlayerReady) {
@@ -118,7 +118,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     }
   }
 
-  /// Pauses the audio playback
+  // Pauses the audio playback
   Future<void> _pauseAudio() async {
     try {
       await _playerController.pausePlayer();
@@ -127,7 +127,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     }
   }
 
-  /// Stops the audio playback
+  // Stops the audio playback
   Future<void> _stopAudio() async {
     try {
       await _playerController.stopPlayer();
@@ -136,7 +136,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     }
   }
 
-  /// Deletes recording and resets UI
+  // Deletes recording and resets UI
   Future<void> _deleteRecording() async {
     try {
       if (_isRecording) await _stopRecording();
@@ -161,7 +161,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     }
   }
 
-  /// Starts the recording timer
+  // Starts the recording timer
   void _startTimer() {
     _recordingDuration = 0;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -171,13 +171,13 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     });
   }
 
-  /// Stops the recording timer
+  // Stops the recording timer
   void _stopTimer() {
     _timer?.cancel();
     _timer = null;
   }
 
-  /// Formats duration in MM:SS format
+  // Formats duration in MM:SS format
   String _formatDuration(int seconds) {
     int minutes = seconds ~/ 60;
     int remainingSeconds = seconds % 60;
@@ -293,45 +293,46 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 12),
 
                 // Waveform display
                 Expanded(
                   child: _isRecording || (_filePath != null && !_isPlayerReady)
-                      ? AudioWaveforms(
-                          enableGesture: false,
-                          size: Size(
-                            MediaQuery.of(context).size.width * 0.6,
-                            40,
-                          ),
-                          recorderController: _recorderController,
-                          waveStyle: const WaveStyle(
-                            waveColor: Colors.white,
-                            showMiddleLine: false,
-                            extendWaveform: true,
-                            waveThickness: 2.5,
-                            spacing: 4.0,
-                            scaleFactor: 50,
-                          ),
-                        )
-                      : _isPlayerReady
-                      ? AudioFileWaveforms(
-                          size: Size(
-                            MediaQuery.of(context).size.width * 0.6,
-                            40,
-                          ),
-                          playerController: _playerController,
-                          enableSeekGesture: true,
-                          waveformType: WaveformType.long,
-                          playerWaveStyle: const PlayerWaveStyle(
-                            fixedWaveColor: Colors.white54,
-                            liveWaveColor: Colors.white,
-                            spacing: 6,
-                            showSeekLine: false,
-                            waveCap: StrokeCap.round,
-                          ),
-                        )
-                      : Container(),
+                    ? AudioWaveforms(
+                        enableGesture: false,
+                        size: Size(
+                          MediaQuery.of(context).size.width * 0.6,
+                          40,
+                        ),
+                        recorderController: _recorderController,
+                        waveStyle: const WaveStyle(
+                          waveColor: Colors.white,
+                          showMiddleLine: false,
+                          extendWaveform: true,
+                          waveThickness: 2.5,
+                          spacing: 4.0,
+                          scaleFactor: 50,
+                        ),
+                      )
+                    : _isPlayerReady
+                    ? AudioFileWaveforms(
+                        size: Size(
+                          MediaQuery.of(context).size.width * 0.6,
+                          40,
+                        ),
+                        playerController: _playerController,
+                        enableSeekGesture: true,
+                        waveformType: WaveformType.long,
+                        playerWaveStyle: const PlayerWaveStyle(
+                          fixedWaveColor: Colors.white54,
+                          liveWaveColor: Colors.white,
+                          spacing: 6,
+                          showSeekLine: false,
+                          waveCap: StrokeCap.round,
+                        ),
+                      )
+                    : Container(),
                 ),
 
                 const SizedBox(width: 8),

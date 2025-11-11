@@ -34,6 +34,7 @@ class _VideoRecordingWidgetState extends State<VideoRecordingWidget> {
     return '$minutes:$seconds';
   }
 
+// Show Video Preview Dialog
   void _showVideoPreview(BuildContext context) {
     showGeneralDialog(
       context: context,
@@ -113,6 +114,8 @@ class _VideoRecordingWidgetState extends State<VideoRecordingWidget> {
 
   @override
   Widget build(BuildContext context) {
+
+    // Video Recorded Thumbnail UI
     return Container(
       decoration: BoxDecoration(
         gradient: RadialGradient(

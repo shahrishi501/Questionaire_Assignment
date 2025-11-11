@@ -1,16 +1,22 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:math' as math;
+
+// Models
+import 'package:questionaire_app/models/experience.dart';
+
+// BLoC
+import 'package:questionaire_app/screens/expereince_screen/bloc/experience_bloc.dart';
 
 // Local Imports
 import 'package:questionaire_app/constants/app_colors.dart';
-import 'package:questionaire_app/models/experience.dart';
-import 'package:questionaire_app/screens/expereince_screen/bloc/experience_bloc.dart';
 import 'package:questionaire_app/screens/onboarding_questions_screens/onboarding_questions_screen.dart';
+import 'package:questionaire_app/widgets/appbar_widget.dart';
+
+// Widgets
 import 'package:questionaire_app/widgets/gradient_button_widget.dart';
 import 'package:questionaire_app/widgets/textfield_widget.dart';
-import 'package:questionaire_app/widgets/waveform_progress_widget.dart';
 
 class ExperienceScreen extends StatefulWidget {
   const ExperienceScreen({super.key});
@@ -41,33 +47,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
     return Scaffold(
       backgroundColor: AppColors.base1,
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: AppColors.surfaceWhite1,
-        centerTitle: true,
-        title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
-          child: SizedBox(
-            width: 300,
-            child: Center(
-              child: WaveProgressIndicator(
-                progress: 0.45, // show 25% completed
-                activeColor: AppColors.primaryAccent,
-                inactiveColor: AppColors.border2,
-              ),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.text1),
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.clear, color: AppColors.text1),
-          ),
-        ],
-      ),
+      appBar: AppbarWidget(progress: 0.45),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Container(

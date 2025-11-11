@@ -4,8 +4,8 @@ class GradientIconWidget extends StatelessWidget {
   final IconData icon;
   final bool isActive;
   final VoidCallback? onTap;
-  const GradientIconWidget({super.key, required this.icon, required this.isActive, this.onTap});
 
+  const GradientIconWidget({super.key, required this.icon, required this.isActive, this.onTap});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

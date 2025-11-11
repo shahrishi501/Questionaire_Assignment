@@ -34,15 +34,6 @@ class _VideoRecordingWidgetState extends State<VideoRecordingWidget> {
     return '$minutes:$seconds';
   }
 
-  void _togglePlayPause() async {
-    if (isPlaying) {
-      await widget.videoPlayerController.pause();
-    } else {
-      await widget.videoPlayerController.play();
-    }
-    setState(() => isPlaying = !isPlaying);
-  }
-
   void _showVideoPreview(BuildContext context) {
     showGeneralDialog(
       context: context,

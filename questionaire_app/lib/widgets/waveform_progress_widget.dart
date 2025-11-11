@@ -14,15 +14,15 @@ class WaveProgressIndicator extends StatelessWidget {
     required this.progress,
     this.activeColor = const Color(0xFF6C63FF),
     this.inactiveColor = Colors.grey,
-    this.amplitude = 6,
-    this.wavelength = 30,
+    this.amplitude = 2,
+    this.wavelength = 20,
     this.thickness = 3,
   });
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(double.infinity, 40),
+      size: const Size(double.infinity, 50),
       painter: _WavePainter(
         progress: progress,
         activeColor: activeColor,

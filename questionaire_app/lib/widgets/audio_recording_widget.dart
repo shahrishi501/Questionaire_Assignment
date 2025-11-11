@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
+
+// Local Imports
 import 'package:questionaire_app/constants/app_colors.dart';
 
 class AudioRecordingWidget extends StatefulWidget {
-  const AudioRecordingWidget({super.key});
+  final VoidCallback? onDelete;
+  final VoidCallback? onComplete;
+  const AudioRecordingWidget({super.key, this.onDelete, this.onComplete});
 
   @override
   State<AudioRecordingWidget> createState() => _AudioRecordingWidgetState();
@@ -17,7 +21,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
   final AudioRecorder _audioRecorder = AudioRecorder();
   late final RecorderController _recorderController;
   late final PlayerController _playerController;
-  
+
   bool _isRecording = false;
   bool _isPlaying = false;
   bool _isPlayerReady = false;
@@ -96,7 +100,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
         );
         setState(() => _isPlayerReady = true);
       }
-
+      widget.onComplete?.call();
       debugPrint("Recording saved at: $path");
     } catch (e) {
       debugPrint("Error stopping recording: $e");
@@ -137,7 +141,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
     try {
       if (_isRecording) await _stopRecording();
       if (_isPlaying) await _stopAudio();
-      
+
       if (_filePath != null && File(_filePath!).existsSync()) {
         await File(_filePath!).delete();
       }
@@ -151,6 +155,7 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
         _filePath = null;
         _isPlayerReady = false;
       });
+      widget.onDelete?.call();
     } catch (e) {
       debugPrint("Error deleting recording: $e");
     }
@@ -222,10 +227,10 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                       _isRecording
                           ? 'Recording Audio...'
                           : _isPlaying
-                              ? 'Playing Audio...'
-                              : _filePath != null 
-                                  ? 'Audio Recorded'
-                                  : 'Recording Audio...',
+                          ? 'Playing Audio...'
+                          : _filePath != null
+                          ? 'Audio Recorded'
+                          : 'Recording Audio...',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -262,36 +267,43 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
               children: [
                 // Recording/Play button
                 GestureDetector(
-                  onTap: _isRecording 
-                      ? _stopRecording 
-                      : _isPlaying 
-                          ? _pauseAudio 
-                          : (_filePath != null ? _playAudio : _startRecording),
+                  onTap: _isRecording
+                      ? _stopRecording
+                      : _isPlaying
+                      ? _pauseAudio
+                      : (_filePath != null ? _playAudio : _startRecording),
                   child: Container(
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _isRecording ? AppColors.primaryAccent : AppColors.secondaryAccent,
+                      color: _isRecording
+                          ? AppColors.primaryAccent
+                          : AppColors.secondaryAccent,
                     ),
                     child: Icon(
-                      _isRecording 
-                          ? Icons.stop 
-                          : _isPlaying 
-                              ? Icons.pause 
-                              : (_filePath != null ? Icons.play_arrow : Icons.mic_none),
+                      _isRecording
+                          ? Icons.stop
+                          : _isPlaying
+                          ? Icons.pause
+                          : (_filePath != null
+                                ? Icons.play_arrow
+                                : Icons.mic_none),
                       color: Colors.white,
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                
-              // Waveform display
+
+                // Waveform display
                 Expanded(
                   child: _isRecording || (_filePath != null && !_isPlayerReady)
                       ? AudioWaveforms(
                           enableGesture: false,
-                          size: Size(MediaQuery.of(context).size.width * 0.6, 40),
+                          size: Size(
+                            MediaQuery.of(context).size.width * 0.6,
+                            40,
+                          ),
                           recorderController: _recorderController,
                           waveStyle: const WaveStyle(
                             waveColor: Colors.white,
@@ -299,28 +311,31 @@ class _AudioRecordingWidgetState extends State<AudioRecordingWidget> {
                             extendWaveform: true,
                             waveThickness: 2.5,
                             spacing: 4.0,
-                            scaleFactor: 50
+                            scaleFactor: 50,
                           ),
                         )
                       : _isPlayerReady
-                          ? AudioFileWaveforms(
-                              size: Size(MediaQuery.of(context).size.width * 0.6, 40),
-                              playerController: _playerController,
-                              enableSeekGesture: true,
-                              waveformType: WaveformType.long,
-                              playerWaveStyle: const PlayerWaveStyle(
-                                fixedWaveColor: Colors.white54,
-                                liveWaveColor: Colors.white,
-                                spacing: 6,
-                                showSeekLine: false,
-                                waveCap: StrokeCap.round,
-                              ),
-                            )
-                          : Container(), 
+                      ? AudioFileWaveforms(
+                          size: Size(
+                            MediaQuery.of(context).size.width * 0.6,
+                            40,
+                          ),
+                          playerController: _playerController,
+                          enableSeekGesture: true,
+                          waveformType: WaveformType.long,
+                          playerWaveStyle: const PlayerWaveStyle(
+                            fixedWaveColor: Colors.white54,
+                            liveWaveColor: Colors.white,
+                            spacing: 6,
+                            showSeekLine: false,
+                            waveCap: StrokeCap.round,
+                          ),
+                        )
+                      : Container(),
                 ),
-                
+
                 const SizedBox(width: 8),
-                
+
                 if (_isRecording)
                   Text(
                     _formatDuration(_recordingDuration),

@@ -3,6 +3,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:io';
+
+// Local Imports
 import 'package:questionaire_app/constants/app_colors.dart';
 import 'package:questionaire_app/widgets/audio_recording_widget.dart';
 import 'package:questionaire_app/widgets/gradient_button_widget.dart';
@@ -24,6 +26,7 @@ class _OnboardingQuestionsScreenState extends State<OnboardingQuestionsScreen> {
   bool isMicActive = false;
   bool isVideoActive = false;
   bool isVideoRecording = false;
+  bool hasAudioRecorded = false;
   bool hasVideoRecorded = false;
   
   CameraController? _cameraController;
@@ -44,7 +47,6 @@ class _OnboardingQuestionsScreenState extends State<OnboardingQuestionsScreen> {
       cameras = await availableCameras();
     } catch (e) {
       print('Error initializing cameras: $e');
-      // Handle the error gracefully
       cameras = [];
     }
   }
@@ -69,11 +71,17 @@ class _OnboardingQuestionsScreenState extends State<OnboardingQuestionsScreen> {
     
     if (status == PermissionStatus.granted) {
       setState(() {
-        isMicActive = !isMicActive;
-        isRecording = isMicActive;
-        // Reset video states when switching to mic
-        isVideoActive = false;
-        isVideoRecording = false;
+       if (!isMicActive) {
+          isMicActive = true;
+          isRecording = true;
+
+          isVideoActive = false;
+          isVideoRecording = false;
+        } else {
+          // Stop recording
+          isRecording = false;
+          isMicActive = false;
+        }
       });
     }
   }
@@ -154,6 +162,22 @@ class _OnboardingQuestionsScreenState extends State<OnboardingQuestionsScreen> {
     }
   }
 
+  void onAudioRecordingComplete() {
+    setState(() {
+      hasAudioRecorded = true;
+      isRecording = false;
+      isMicActive = false;
+    });
+  }
+
+  void deleteRecording() {
+    setState(() {
+      isRecording = false;
+      isMicActive = false;
+      hasAudioRecorded = false;
+    });
+  }
+
   void _deleteVideo() {
     setState(() {
       hasVideoRecorded = false;
@@ -210,189 +234,200 @@ class _OnboardingQuestionsScreenState extends State<OnboardingQuestionsScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background.png'),
-            fit: BoxFit.cover,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.25),
-              spreadRadius: 0,
-              blurRadius: 4,
-              offset: const Offset(0, 4),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/background.png'),
+              fit: BoxFit.cover,
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '01',
-                    style: TextStyle(
-                      color: AppColors.text5,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: "spaceGrotesk",
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Why do you want to host with us?',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: AppColors.text1,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "spaceGrotesk",
-                      letterSpacing: -0.48,
-                      height: 1.33,
-                    ),
-                  ),
-                  Text('Tell us about your intent and what motivates you to create experiences.', 
-                    style: TextStyle(
-                      color: AppColors.text3,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: "spaceGrotesk",
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              
-              // Camera Preview
-              if (isVideoActive && _cameraController != null && _cameraController!.value.isInitialized)
-                Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    Container(
-                      height: 500,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.border1),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CameraPreview(_cameraController!),
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: GestureDetector(
-                        onTap: _switchCamera,
-                        child: Container(
-                          padding: EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Icon(Icons.cameraswitch, color: Colors.white, size: 24),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              
-              if (!isVideoActive && !hasVideoRecorded)
-                TextfieldWidget(hintText: '/ Start typing here', textController: textController, maxLength: 600, maxLines: 8,),
-              
-              SizedBox(height: 16,),
-              
-              if(isRecording)
-                AudioRecordingWidget(),
-              
-              if(hasVideoRecorded && _videoPlayerController != null)
-                VideoRecordingWidget(
-                  videoPlayerController: _videoPlayerController!,
-                  duration: videoDuration,
-                  onDelete: _deleteVideo,
-                ),
-
-              SizedBox(height: 16),
-
-              Flexible(
-                child: Row(
-                  children: [
-                    // Animate disappearance of mic + video buttons
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      height: 56,
-                      width: (hasVideoRecorded || isRecording) ? 0 : 100,
-                      child: (hasVideoRecorded || isRecording)
-                        ? const SizedBox.shrink()
-                        : Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.border1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _toggleMic,
-                                child: GradientIconWidget(
-                                  icon: Icons.mic_none,
-                                  isActive: isMicActive,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 1,
-                              height: 20,
-                              color: AppColors.border1,
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _toggleVideo,
-                                child: GradientIconWidget(
-                                  icon: isVideoRecording
-                                      ? Icons.stop
-                                      : Icons.videocam_outlined,
-                                  isActive: isVideoActive || isVideoRecording,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      width: (hasVideoRecorded || isRecording) ? 0 : 16,
-                      child: const SizedBox(),
-                    ),
-                
-                    Expanded(
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        width: double.infinity,
-                        child: GestureDetector(
-                          child: GradientButtonWidget(
-                            isActive: hasVideoRecorded || isRecording, 
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                spreadRadius: 0,
+                blurRadius: 4,
+                offset: const Offset(0, 4),
               ),
             ],
+          ),
+          child: SingleChildScrollView(
+            reverse: true,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 
+                              MediaQuery.of(context).padding.top - 
+                              kToolbarHeight - 
+                              MediaQuery.of(context).viewInsets.bottom - 20,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '01',
+                          style: TextStyle(
+                            color: AppColors.text5,
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            fontFamily: "spaceGrotesk",
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Why do you want to host with us?',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: AppColors.text1,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "spaceGrotesk",
+                            letterSpacing: -0.48,
+                            height: 1.33,
+                          ),
+                        ),
+                        Text('Tell us about your intent and what motivates you to create experiences.', 
+                          style: TextStyle(
+                            color: AppColors.text3,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "spaceGrotesk",
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    
+                    // Camera Preview
+                    if (isVideoActive && _cameraController != null && _cameraController!.value.isInitialized)
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Container(
+                            height: 500,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.border1),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CameraPreview(_cameraController!),
+                            ),
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: GestureDetector(
+                              onTap: _switchCamera,
+                              child: Container(
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(Icons.cameraswitch, color: Colors.white, size: 24),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    
+                    TextfieldWidget(hintText: '/ Start typing here', textController: textController, maxLength: 600, maxLines: 8,),
+                    
+                    SizedBox(height: 16,),
+                    
+                    if(isRecording || hasAudioRecorded)
+                      AudioRecordingWidget(onDelete: deleteRecording, onComplete: onAudioRecordingComplete,),
+                    
+                    if(hasVideoRecorded && _videoPlayerController != null)
+                      VideoRecordingWidget(
+                        videoPlayerController: _videoPlayerController!,
+                        duration: videoDuration,
+                        onDelete: _deleteVideo,
+                      ),
+              
+                    SizedBox(height: 16),
+              
+                    Row(
+                      children: [
+                        // Animate disappearance of mic + video buttons
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          height: 56,
+                          width: (hasVideoRecorded || hasAudioRecorded) ? 0 : 100,
+                          child: (hasVideoRecorded || hasAudioRecorded)
+                            ? const SizedBox.shrink()
+                            : Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColors.border1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _toggleMic,
+                                    child: GradientIconWidget(
+                                      icon: Icons.mic_none,
+                                      isActive: isMicActive,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 20,
+                                  color: AppColors.border1,
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _toggleVideo,
+                                    child: GradientIconWidget(
+                                      icon: isVideoRecording
+                                          ? Icons.stop
+                                          : Icons.videocam_outlined,
+                                      isActive: isVideoActive || isVideoRecording,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          width: (hasVideoRecorded || hasAudioRecorded) ? 0 : 16,
+                          child: const SizedBox(),
+                        ),
+                    
+                        Expanded(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            width: double.infinity,
+                            child: GestureDetector(
+                              child: GradientButtonWidget(
+                                isActive: hasVideoRecorded || isRecording || hasAudioRecorded, 
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

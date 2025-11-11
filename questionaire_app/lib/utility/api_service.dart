@@ -49,7 +49,7 @@ class ApiConstant {
       log(
         url,
         error: prettyJson(response.data),
-        name: "GET/" + response.statusCode.toString(),
+        name: "GET/${response.statusCode}",
       );
       return Response(statusCode: response.statusCode!, data: response.data);
     } catch (e) {
@@ -92,7 +92,7 @@ class ApiConstant {
       log(
         url,
         error: prettyJson(response.data),
-        name: "POST/" + response.statusCode.toString(),
+        name: "POST/${response.statusCode}",
       );
 
       return Response(statusCode: response.statusCode!, data: response.data);

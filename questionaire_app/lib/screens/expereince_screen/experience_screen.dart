@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// Local Imports
 import 'package:questionaire_app/constants/app_colors.dart';
 import 'package:questionaire_app/models/experience.dart';
 import 'package:questionaire_app/screens/expereince_screen/bloc/experience_bloc.dart';
@@ -155,20 +156,17 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                                 );
                               },
                               child: ListView.builder(
-                                key: ValueKey('${experiences.map((e) => e.id).join(',')}_${DateTime.now().millisecondsSinceEpoch}'),
+                                key: ValueKey(experiences.map((e) => e.id).join(',')),
                                 itemCount: experiences.length,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, index) {
                                   final experience = experiences[index];
-                                  final isSelected = selectedExperienceId
-                                      .contains(experience.id);
+                                  final isSelected = selectedExperienceId.contains(experience.id);
                               
                                   // For rotation of container
                                   final rotationPattern = [-3.0, 3.0, 0.0];
-                                  final rotationDegrees =
-                                      rotationPattern[index % 3];
-                                  final rotationAngle =
-                                      rotationDegrees * (math.pi / 180);
+                                  final rotationDegrees = rotationPattern[index % 3];
+                                  final rotationAngle = rotationDegrees * (math.pi / 180);
                               
                                   return Padding(
                                     padding: const EdgeInsets.only(
@@ -188,6 +186,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                                             selectedExperienceId.add(
                                               experience.id,
                                             );
+
                                           }
                                         });
                                       },
@@ -261,6 +260,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                       maxLength: 250,
                     ),
                     SizedBox(height: 20),
+
                     GradientButtonWidget(
                       isActive: selectedExperienceId.isNotEmpty,
                       onPressed: () {

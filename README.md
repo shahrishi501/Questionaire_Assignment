@@ -62,3 +62,7 @@
   - As soon as the recording or video is done, the buttons disappear and the Next button takes the full width
   - If any of the both recording or video is done, Next button also displays the gradient with the animation mentioned above  
   - They come back as well on deleting the corresponding video or audio  
+
+
+https://github.com/user-attachments/assets/f33b0678-cfd7-4a4b-88e5-329810871b27
+
